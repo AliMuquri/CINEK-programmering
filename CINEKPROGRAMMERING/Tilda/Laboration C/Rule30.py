@@ -1,4 +1,5 @@
 import datetime
+import math
 
 
 class Rule30():
@@ -14,30 +15,49 @@ class Rule30():
             "001": "1",
             "000": "0"
         }
-        self.thisGen = self.setSeed()
 
-    def setSeed(self):
-        seed =[None]*8
-        tNow = datetime.datetime.now()
-        value = str(tNow.second)+str(tNow.microsecond)
+        self.thisGen=None
+    def setSeed(self,n):
+        seed =[None]*n
+        value=""
+        while len(value) <=n-1:
+            tNow = datetime.datetime.now()
+            value += str(tNow.microsecond)
+
+        if len(value)>n:
+            value=value[:n]
+
         for i, val in enumerate(value):
             if int(val) % 2 == 0:
-                seed[i] = 1
+                seed[i] = "1"
             else:
-                seed[i] = 0
+                seed[i] = "0"
+        return seed
 
-        x=seed.find(None)
-        if x==-1:
-            return seed
-        else:
-            seed[0]
-            return seed
+    def generate(self,length):
+        n=math.floor(math.log2(length))+1
 
-    def generate(self):
+        check=True
+        while check:
+            self.thisGen=self.setSeed(n)
+            newGen=[None]*n
+            seed=self.thisGen
+            i=0
+            for s in range(3,n+1):
+                newGen[s-2]=self.rule30["".join(seed[i:s])]
+                i+=1
+            end=n-1
+            if int("".join(newGen[1:end-1]))%2==0:
+                newGen[0]="0"
+            else:
+                newGen[0]="1"
+            if int("".join(newGen[:end-1]))%2==0:
+                newGen[end]="1"
+            else:
+                newGen[end]="0"
+            self.thisGen=newGen
+            randomNr=int("".join(newGen),2)
+            if randomNr<=length:
+                check=False
 
-        return randomN
-
-
-
-m = Rule30()
-#print(m.generate())
+        return randomNr

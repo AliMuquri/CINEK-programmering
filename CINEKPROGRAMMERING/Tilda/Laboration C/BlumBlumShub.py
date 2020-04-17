@@ -1,24 +1,28 @@
 import datetime
+import math
 
+
+primefile = open("prime.txt", 'r')
+primetext = primefile.readlines()
 
 class BlumBlumShub():
 
     def __init__(self):
         self.M = None
-        self.thisGen = self.setSeed()
+        self.thisGen = None
 
     def setSeed(self):
         tNow = datetime.datetime.now()
-        s = str(tNow.microsecond)
         p, q = self.getPrimes()
-        M = pq
-        n = len(M)
-        s = str(tNow.microsecond)
+        M = p*q
+        n = len(str(M))
+        s = tNow.microsecond
         while M < s:
+            tNow = datetime.datetime.now()
             s = tNow.microsecond
             if n < 6:
                 s = str(s)
-                s = s[:n]
+                s = int(s[:n])
         self.M = M
         seed = s**2 % M
         return seed
@@ -26,24 +30,48 @@ class BlumBlumShub():
 
     def getPrimes(self):
         x, y = 1, 1
-        primefile = open("prime.txt", 'r')
-        primetext = primefile.readlines()
+
         while x % 4 != 3 or y % 4 != 3:
-            tNow = datetime.datetime.now()
-            index = str(tNow.microsecond)
             if x % 4 != 3:
-                x = int(primetext[int(index[:1])].split()[int(index[4])])
+                tNow = datetime.datetime.now()
+                index1=tNow.second
+                if index1>9:
+                    index1=int(str(index1)[1])
+                index = int(str(tNow.microsecond)[:2])
+                x = int(primetext[index].split()[index1])
+
             if y % 4 != 3:
-                y = int(primetext[int(index[2:3])].split()[int(index[5])])
-            print(x)
-            print(y)
+                tNow = datetime.datetime.now()
+                index1=tNow.second
+                if index1>9:
+                    index1=int(str(index1)[1])
+                index = int(str(tNow.microsecond)[:2])
+                y = int(primetext[index].split()[index1])
+
+            if x==y:
+                x,y=1,1
+
         return x, y
 
-    def generate(self):
+    def generate(self,length):
+        n=math.floor(math.log2(length))+1
+        check=True
+        self.thisGen=self.setSeed()
         x, M = self.thisGen, self.M
-        self.thisGen = (x**2) mod M
+        while check:
+            seq=[]
+            for i in range(n):
+                self.thisGen = (x**2)% M
+                seq.append(self.thisGen)
+                x=self.thisGen
 
-        return randomN
-
-m = BlumBlumShub()
-print(m.generate())
+            newNum=""
+            for par in seq:
+                if int(par)%2==0:
+                    newNum+="1"
+                else:
+                    newNum+="0"
+            self.thisGen=int(newNum,2)
+            if self.thisGen<=length:
+                check=False
+        return self.thisGen
