@@ -116,7 +116,9 @@ class CodeWriter(object):
         sgmtType = eval("S_" + segment.upper())
         text = []
         appendage = []
-        text.extend(("@" + str(index), "D=A"))
+        if not index == 'CALL':
+            text.extend(("@" + str(index), "D=A"))
+
         if commandType == C_PUSH:
 
             if sgmtType == S_ARGUMENT:
@@ -145,7 +147,11 @@ class CodeWriter(object):
             if sgmtType == S_CONSTANT:
                 text.extend(("@SP", "A=M", "M=D", "@SP", "M=M+1"))
             else:
-                text.extend(appendage)
+                if index == 'CALL':
+                    appendage = appendage[0]
+                    text.append(appendage)
+                else:
+                    text.extend(appendage)
                 text.extend(("D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1"))
 
         elif commandType == C_POP:
@@ -207,8 +213,9 @@ class CodeWriter(object):
         conditionBoolean = [T_AND, T_OR]
 
         if command in conditionCmp:
-            text = ["@SP", "AM=M-1", "D=M", "@SP" "A=M-1", "D=M-D", "@T_JUMP", "@F_JUMP", "0;JMP",
-                    "(T_JUMP)", "@SP", "A=M", "M=-1", "@END", "0;JMP", "(F_JUMP)", "@SP", "A=M", "M=0", "(END)", "@SP", "M=M+1"]
+            n = self._UniqueLabel()
+            text = ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "D=M-D", "@T_JUMP" + n, "@F_JUMP" + n, "0;JMP",
+                    "(T_JUMP" + n + ")", "@SP", "A=M", "M=-1", "@END" + n, "0;JMP", "(F_JUMP" + n + ")", "@SP", "A=M", "M=0", "(END" + n + ")", "@SP", "M=M+1"]
 
         elif command in conditionComp or conditionBoolean:
             text = ["@SP", "AM=M-1", "D=M", "@SP",
@@ -231,7 +238,7 @@ class CodeWriter(object):
         elif T_OR == command:
             text.insert(5, "M=D|M")
         elif T_NOT == command:
-            text = ["@SP", "A= M-1", "M=!M"]
+            text = ["@SP", "A=M-1", "M=!M"]
 
         newline = '\n'
         code = newline.join(text)
@@ -243,6 +250,14 @@ class CodeWriter(object):
         Write the VM initialization code:
         To be implemented as part of Project 7
         """
+        text = ["@256", "D=A", "@SP", "M=D"]
+        newline = '\n'
+        code = newline.join(text)
+        self._WriteCode(code)
+
+        if sysinit:
+            self.WriteCall("Sys.init", '0')
+
         if (debug):
             self.file.write('    // Initialization code\n')
 
@@ -253,17 +268,31 @@ class CodeWriter(object):
 
         """
 
+        self._WriteCode("(" + label + ")")
+
     def WriteGoto(self, label):
         """
         Write Hack code for 'goto' VM command.
         To be implemented as part of Project 7
         """
+        text = ["@" + label, "0;JMP"]
+
+        newline = '\n'
+        code = newline.join(text)
+
+        self._WriteCode(code)
 
     def WriteIf(self, label):
         """
         Write Hack code for 'if-goto' VM command.
         To be implemented as part of Project 7
         """
+        text = ["@SP", "AM=M-1", "D=M", "M=0", "@" + label, "D;JNE"]
+
+        newline = '\n'
+        code = newline.join(text)
+
+        self._WriteCode(code)
 
     def WriteFunction(self, functionName, numLocals):
         """
@@ -271,14 +300,61 @@ class CodeWriter(object):
         To be implemented as part of Project 7
         """
 
+        text = ["(" + functionName + ")", ]
+        for i in range(int(numLocals)):
+            text.extend(['@0', 'D=A', '@SP', 'A=M', 'M=D', '@SP', 'M=M+1'])
+
     def WriteReturn(self):
         """
         Write Hack code for 'return' VM command.
         To be implemented as part of Project 7
         """
+        n = [('5', 'Return'), ('1', 'THAT'),
+             ('2', 'THIS'), ('3', 'ARG'), ('4', 'LCL')]
+        newline = '\n'
+        text = ["@LCL", "D=M"]
+
+        for x, y in n:
+            if y == 'Return':
+                text.extend(["@FRAME", "AM=D"])
+            else:
+                text.extend(["@FRAME", "D=M"])
+
+            text.extend(["@" + x, "A=D-A", "D=M", "@" + y, "M=D"])
+            if x == '5':
+                code = newline.join(text)
+                self._WriteCode(code)
+                self.WritePushPop(3, 'argument', 0)
+                text = ["@ARG", "D=M", "@SP", "M=D+1"]
+                code = newline.join(text)
+                self._WriteCode(code)
+                text = []
+
+        text.extend(["@Return", "A=M", "0;JMP"])
+
+        newline = '\n'
+        code = newline.join(text)
+        self._WriteCode(code)
 
     def WriteCall(self, functionName, numArgs):
         """
         Write Hack code for 'call' VM command.
         To be implemented as part of Project 7
         """
+        newline = '\n'
+        fName = functionName + "_" + str(numArgs)
+        self._WriteCode("@" + fName)
+        text = ["D=A", "@SP", "A=M", "M=D", "@SP", "M = M + 1"]
+        code = newline.join(text)
+        self._WriteCode(code)
+        self.WritePushPop(2, 'local', 'CALL')
+        self.WritePushPop(2, 'argument', 'CALL')
+        self.WritePushPop(2, 'this', 'CALL')
+        self.WritePushPop(2, 'that', 'CALL')
+        text = ["@SP", "D=M", "@" +
+                str(numArgs), "D=D-A", "@5", "D=D-A", "@ARG", "M=D", "@SP, D=M, @LCL", "M=D"]
+
+        code = newline.join(text)
+        self._WriteCode(code)
+        self.WriteGoto(fName)
+        self.WriteLabel(fName)

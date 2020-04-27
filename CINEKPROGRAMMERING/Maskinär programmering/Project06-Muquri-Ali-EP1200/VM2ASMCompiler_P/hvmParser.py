@@ -92,7 +92,11 @@ class Parser(object):
         n = len(currentLine)
         # this should store the type of the command
         try:
-            self.commandType = eval("C_" + currentLine[0].upper())
+            if not currentLine[0] == "if-goto":
+                self.commandType = eval("C_" + currentLine[0].upper())
+            else:
+                self.commandType = eval("C_" + currentLine[0][:2].upper())
+
         except:
             self.commandType = C_ARITHMETIC
             self.arg1 = currentLine[0]
@@ -100,8 +104,12 @@ class Parser(object):
 
         # this should store the first argument of the command (if there is a first argument)
         self.arg1 = None
-        if not self.commandType == C_ARITHMETIC and not self.commandType == "C_RETURN":
-            self.arg1 = currentLine[1]
+        if not self.commandType == C_ARITHMETIC:
+            if self.commandType == C_RETURN:
+                self.arg1 = currentLine[0]
+            else:
+
+                self.arg1 = currentLine[1]
 
         # this should store the second argument of the command (if there is a second argument)
         self.arg2 = None
