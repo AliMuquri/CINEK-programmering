@@ -14,10 +14,10 @@ class Square {
 
     /** Increments the size by 2. */
     method void incSize() {
-	var int i,j;
-	var int k;
-	let edge = edge + 2;
-        return;
+	     var int i,j;
+	     var int k;
+	     let edge = edge + 2;
+       return;
     }
 
     /** Decrements the size by 2. */
@@ -27,7 +27,7 @@ class Square {
         }
         return;
     }
-    
+
     method int area() {
         return edge*edge;
     }

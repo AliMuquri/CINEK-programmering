@@ -3,23 +3,23 @@ class Main {
 		var List v, w, x;
 		let v = List.new(3,null);
 		do v.insertInOrder(6);
-		do v.insertInOrder(5); 
-		
+		do v.insertInOrder(5);
+
 		do v.print();
 		do Output.println();
 
 		do v.insertInOrder(2);
-		
+
 		do v.print();
 		do Output.println();
 
 		do v.insertInOrder(4);
-		
+
 		do v.print();
 		do Output.println();
 
 		do v.insertInOrder(10);
-		
+
 		do v.print();
 		do Output.println();
 
@@ -29,7 +29,7 @@ class Main {
 			do w.print();
 		}
 		else{
-			do Output.printString("Not Found!");
+			do Output.printString("Not Found! (OK)");
 		}
 		do Output.println();
 
@@ -38,7 +38,7 @@ class Main {
 			do x.print();
 		}
 		else{
-			do Output.printString("Not Found!");
+			do Output.printString("Not Found! (OK)");
 		}
 		do Output.println();
 
@@ -47,10 +47,10 @@ class Main {
 			do x.print();
 		}
 		else{
-			do Output.printString("Not Found!");
+			do Output.printString("Not Found! (OK)");
 		}
 		do Output.println();
 
-		return; 
+		return;
 	}
-} 
+}

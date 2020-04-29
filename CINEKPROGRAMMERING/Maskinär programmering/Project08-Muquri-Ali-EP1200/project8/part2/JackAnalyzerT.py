@@ -1,4 +1,4 @@
-#!/usr/bin/python32
+#!/usr/bin/python3
 """
 JackAnalyzer.py -- Hack computer Jack compiler
 """
@@ -47,7 +47,7 @@ def Usage():
     print()
     print('    -s option writes source as /// comments in .vm files.')
     sys.exit(-1)
-    
+
 
 def main():
     global source, debug
@@ -64,16 +64,16 @@ def main():
                 del (sys.argv[1])
                 continue
         break
-        
+
     if len(sys.argv) != 2:
         Usage()
-        
+
     sourceName = sys.argv[1]
     if os.path.isdir(sourceName):
         dirName = sourceName
     else:
         dirName = '.'
-    
+
     if os.path.isdir(sourceName):
         # process all .jack files in dir
         dirName = sourceName

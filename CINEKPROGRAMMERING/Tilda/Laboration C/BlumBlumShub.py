@@ -64,7 +64,7 @@ class BlumBlumShub():
                 self.thisGen = (x**2) % M
                 seq.append(self.thisGen)
                 if x == self.thisGen:
-                    self.thisGen = self.generate()
+                    self.thisGen = self.generate(length)
                     return self.thisGen
                 x = self.thisGen
 

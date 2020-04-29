@@ -10,7 +10,7 @@ class List {
 
     /* Creates a List. */
     constructor List new(int car, List cdr) {
-        let data = car;       // the identifiers car and cdr are used in 
+        let data = car;       // the identifiers car and cdr are used in
         let next = cdr;       // memory of the Lisp programming language
         return this;
     }
@@ -41,6 +41,38 @@ class List {
         return;
     }
 
+    method void insertInOrder(int element){
+        var List v;
+        if (data < element){
+          if (~(next=null)){
+            do next.insertInOrder(element);
+          }
+          else{
+            let v = List.new(element,null);
+            let next = v;
+          }
+        }
+        else{
+          let v = List.new(data,next);
+          let data=element;
+          let next = v;
+        }
+        return;
+    }
+    method void find(int element){
+      if (data=element){
+        do print();
+      }
+      else{
+        if (~(next=null)){
+          do next.find(element);
+        }
+        else{
+          do Output.printInt(current.getData());
+        }
+      }
+      return;
+    }
     // More list processing methods can come here.
 
 }

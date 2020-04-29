@@ -7,6 +7,7 @@ import numpy as np
 from scipy.stats import *
 from PIL import Image
 from math import *
+from Randomnesstest import *
 
 
 class Statistic():
@@ -21,9 +22,9 @@ class Statistic():
         self.tableRule30 = []
         self.descreptiveStats()
         self.chi2(length)
-        #self.mediantest(length, size)
+        self.mediantest()
         self.runGraph(length)
-        self.randompixelImage(size)
+        #self.randompixelImage(size)
 
     def runGenerate(self, length, size):
         print("Running number generators")
@@ -85,17 +86,26 @@ class Statistic():
             "     " + str(pRule30)
         print(text)
 
-    def mediantest(self, length, size):
-        median = size / length
-        n = [median] * size
-        zBBS, pBBS, medianBBS, tblB = median_test(self.freqBBS, n)
-        zRule30, pRule30, medianRule30, tblR = median_test(self.freqRule30, n)
-        text = "          Z- values         |    P-values  |            Medianfrequency  \n "
-        text += "BBS     " + str(zBBS) + "      " + \
-            str(pBBS) + "      " + str(medianBBS) + "\n"
-        text += "Rule30   " + str(zRule30) + "      " + \
-            str(pRule30) + "        " + str(medianRule30)
+    def mediantest(self):
+        arrayBBS = np.asarray(self.BBSNums)
+        arrayRule30 = np.asarray(self.Rule30Nums)
+        zBBS,pBBS=runs_test(arrayBBS,np.median(arrayBBS))
+        zRule30,pRule30=runs_test(arrayRule30,np.median(arrayRule30))
+        text = "          Z-score         |    z-alpha   \n"
+        text += "BBS      " + str(zBBS) + "     " + str(pBBS) + "\n"
+        text += "Rule30   " + str(zRule30) + \
+            "     " + str(pRule30)
         print(text)
+        # median = size / length
+        # n = [median] * size
+        # zBBS, pBBS, medianBBS, tblB = median_test(self.freqBBS, n,ties="below")
+        # zRule30, pRule30, medianRule30, tblR = median_test(self.freqRule30, n,ties="below")
+        # text = "          Z- values         |    P-values  |            Medianfrequency  \n "
+        # text += "BBS     " + str(zBBS) + "      " + \
+        #     str(pBBS) + "      " + str(medianBBS) + "\n"
+        # text += "Rule30   " + str(zRule30) + "      " + \
+        #     str(pRule30) + "        " + str(medianRule30)
+        # print(text)
 
     def randompixelImage(self, size):
         size = int(sqrt(size))
@@ -117,7 +127,7 @@ class Statistic():
 if __name__ == "__main__":
     while True:
         check = False
-        length = 10
+        length = 15
         size = 10000
         statistic = Statistic(length, size)
         print(statistic)
